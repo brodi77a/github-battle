@@ -1,5 +1,6 @@
 var React = require("react");
-var NavLink = require("react-router-dom").NavLink; //dynamically change the style of the anchor
+var NavLink = require("react-router-dom").NavLink; 
+//dynamically change the style of the anchor
 //tag based on if the route is active.
 //NavLink incorporates Link as well but
 //with other properties attached to it. If you

@@ -4,30 +4,24 @@ function getProfile(username) {
   return axios
     .get(`https://api.github.com/users/${username}`)
 
-    .then(function(user) {
-      return user.data;
-    });
+    .then(({ data }) => data);
 }
 
 function getRepos(username) {
-  return axios.get(
-    `https://api.github.com/users/${username}/repos`
-  );
+  return axios.get(`https://api.github.com/users/${username}/repos`);
 }
 
 function getStarCount(repos) {
   //to get a total count of the player's stars
-  return repos.data.reduce(function(count, repo) {
-    return count + repo.stargazers_count;
-  }, 0);
+  return repos.data.reduce(
+    (count, stargazers_count) => count + repo.stargazers_count,
+    0
+  );
 }
 
-function calculateScore(profile, repos) {
+function calculateScore({ followers }, repos) {
   //well it's in the name...
-  var followers = profile.followers;
-  var totalStars = getStarCount(repos);
-
-  return followers * 3 + totalStars;
+  return followers * 3 + getStarCount(repos);
 }
 
 function handleError(error) {
@@ -38,39 +32,30 @@ function handleError(error) {
 }
 
 function getUserData(player) {
-  return axios.all([getProfile(player), getRepos(player)]).then(function(data) {
-    var profile = data[0];
-    var repos = data[1];
-
-    return {
-      profile: profile,
+  return Promise.all([getProfile(player), getRepos(player)]).then(
+    ([profile, repos]) => ({
+      profile,
       score: calculateScore(profile, repos)
-    };
-  });
+    })
+  );
 }
 
 function sortPlayers(players) {
-  return players.sort(function(a, b) {
-    return b.score - a.score;
-  });
+  return players.sort((a, b) => b.score - a.score);
 }
 
 module.exports = {
-  battle: function(players) {
-    return axios
-      .all(players.map(getUserData))
+  battle(players) {
+    return Promise.all(players.map(getUserData))
       .then(sortPlayers)
       .catch(handleError);
   },
 
   fetchPopularRepos: function(language) {
-    var encodedURI = window.encodeURI(
+    const encodedURI = window.encodeURI(
       `https://api.github.com/search/repositories?q=stars:>1+language:${language}&sort=stars&order=desc&type=Repositories`
     );
 
-    return axios.get(encodedURI).then(function(response) {
-      //this is a promise. When the url is resolved the function will run
-      return response.data.items;
-    });
+    return axios.get(encodedURI).then(({ data }) => data.items);
   }
 };

@@ -1,9 +1,13 @@
 var path = require("path");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 //This will create an index.html file in the dist foler as well as include the index_bundle.js as well
+var webpack = require("webpack");
 
-module.exports = {
-  entry: "./app/index.js",
+var config = {
+  entry: ["babel-polyfill", "./app/index.js"],
+  //since Promises cannot be transpiled by the babel-loader ("Promises"
+  //do not come native with babel-loader) therefore we need the babel-polyfill to
+  //be able to nclude "Promises" in the event of backward capability of certain browsers.
   output: {
     path: path.resolve(__dirname, "dist"),
     //path is a utlity that links to the directory
@@ -33,3 +37,16 @@ module.exports = {
     })
   ]
 };
+
+if (process.env.NODE_ENV === "production") {
+  config.plugins.push(
+    new webpack.DefinePlugin({
+      "process.env": {
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV)
+      }
+    }),
+    new webpack.optimize.UglifyJsPlugin()
+  );
+}
+
+module.exports = config;
