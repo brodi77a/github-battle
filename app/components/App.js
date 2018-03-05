@@ -25,10 +25,7 @@ class App extends React.Component {
             <Route path="/battle/results/" component={Results} />
             <Route path="/popular" component={Popular} />
             <Route
-              render={() => {
-                return <p>Not Found!</p>;
-              }}
-            />
+              render={() => <p>Not Found!</p>} />
           </Switch>
         </div>
       </Router>

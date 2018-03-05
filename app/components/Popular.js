@@ -3,25 +3,21 @@ var PropTypes = require("prop-types");
 var api = require("../utils/api");
 var Loading = require("./Loading");
 
-function SelectLanguage(props) {
+function SelectLanguage({ selectedLanguage, onSelect }) {
   //This is a functional stateless component. In future React, it would be able to have state in functional components
-  var languages = ["All", "Javascript", "Ruby", "Java", "CSS", "Python"];
+  const languages = ["All", "Javascript", "Ruby", "Java", "CSS", "Python"];
 
   return (
     <ul className="languages">
-      {languages.map(lang => {
-        return (
-          <li
-            style={
-              lang === props.selectedLanguage ? { color: "#d0021b" } : null
-            }
-            onClick={props.onSelect.bind(null, lang)}
-            key={lang}
-          >
-            {lang}
-          </li>
-        );
-      })}
+      {languages.map(lang => (
+        <li
+          style={lang === selectedLanguage ? { color: "#d0021b" } : null}
+          onClick={() => onSelect(lang)}
+          key={lang}
+        >
+          {lang}
+        </li>
+      ))};
       {/* We can use the fat arrow function, so that we do not have to use the second "this"
             The first this is bound to the new instance of the function rather than the one outside of it
             This is using ES5 versus Es6
@@ -30,30 +26,28 @@ function SelectLanguage(props) {
   );
 }
 
-function RepoGrid(props) {
+function RepoGrid({ repos }) {
   return (
     <ul className="popular-list">
-      {props.repos.map((repo, index) => {
-        return (
-          <li key={repo.name} className="popular-item">
-            <div className="popular-rank">#{index + 1}</div>
-            <ul className="space-list-items">
-              <li>
-                <img
-                  className="avatar"
-                  src={repo.owner.avatar_url}
-                  alt={`Avatar for ${repo.owner.login}`}
-                />
-              </li>
-              <li>
-                <a href={repo.html_url}>{repo.name}</a>
-              </li>
-              <li>@ {repo.owner.login}</li>
-              <li>{repo.stargazers_count} stars</li>
-            </ul>
-          </li>
-        );
-      })}
+      {repos.map(({ name, stargazers_count, owner, html_url }, index) => (
+        <li key={name} className="popular-item">
+          <div className="popular-rank">#{index + 1}</div>
+          <ul className="space-list-items">
+            <li>
+              <img
+                className="avatar"
+                src={owner.avatar_url}
+                alt={`Avatar for ${owner.login}`}
+              />
+            </li>
+            <li>
+              <a href={html_url}>{name}</a>
+            </li>
+            <li>@ {owner.login}</li>
+            <li>{stargazers_count} stars</li>
+          </ul>
+        </li>
+      ))}
     </ul>
   );
 }
@@ -77,35 +71,24 @@ class Popular extends React.Component {
   }
 
   updateLanguage(lang) {
-    this.setState(() => {
-      return {
-        selectedLanguage: lang,
-        repos: null
-      };
-    });
+    this.setState(() => ({
+      selectedLanguage: lang,
+      repos: null
+    }));
 
-    api.fetchPopularRepos(lang).then(
-      function(repos) {
-        this.setState(function() {
-          return {
-            repos: repos
-          };
-        });
-      }.bind(this)
-    );
+    api.fetchPopularRepos(lang).then(repos => this.setState(() => ({ repos })));
   }
+
   render() {
+    const { selectedLanguage, repos } = this.state;
+
     return (
       <div>
         <SelectLanguage
-          selectedLanguage={this.state.selectedLanguage}
+          selectedLanguage={selectedLanguage}
           onSelect={this.updateLanguage}
         />
-        {!this.state.repos ? (
-          <Loading />
-        ) : (
-          <RepoGrid repos={this.state.repos} />
-        )}
+        {!repos ? <Loading /> : <RepoGrid repos={repos} />}
       </div>
     );
   }
