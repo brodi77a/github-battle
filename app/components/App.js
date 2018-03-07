@@ -1,14 +1,12 @@
-var React = require("react");
-var ReactRouter = require("react-router-dom");
-var Router = ReactRouter.BrowserRouter;
-var Route = ReactRouter.Route;
-var Switch = ReactRouter.Switch; //Instead of rendering all routes that are active
+import React from "react";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+// Switch: Instead of rendering all routes that are active
 //it will render only one specific route
-var Home = require("./Home");
-var Battle = require("./Battle");
-var Popular = require("./Popular");
-var Nav = require("./Nav");
-var Results = require("./Results");
+import Home from "./Home";
+import Battle from "./Battle";
+import Popular from "./Popular";
+import Nav from "./Nav";
+import Results from "./Results";
 
 class App extends React.Component {
   render() {
@@ -33,4 +31,4 @@ class App extends React.Component {
   }
 }
 
-module.exports = App;
+export default App;
