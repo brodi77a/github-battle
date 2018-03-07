@@ -4,7 +4,7 @@ var HtmlWebpackPlugin = require("html-webpack-plugin");
 var webpack = require("webpack");
 
 var config = {
-  entry: ["babel-polyfill", "./app/index.js"],
+  entry: ["babel-polyfill", "whatwg-fetch", "./app/index.js"],
   //since Promises cannot be transpiled by the babel-loader ("Promises"
   //do not come native with babel-loader) therefore we need the babel-polyfill to
   //be able to nclude "Promises" in the event of backward capability of certain browsers.
